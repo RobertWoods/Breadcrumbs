@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 toggleDrop = !toggleDrop;
+                Toast.makeText(getBaseContext(), "Dropping Crumbs: " + toggleFollow, Toast.LENGTH_SHORT).show();
             }
         });
         findViewById(R.id.toggle_follow_button).setOnClickListener(new View.OnClickListener() {
@@ -129,7 +130,10 @@ public class MainActivity extends AppCompatActivity {
                             oldLocation.getLongitude())));
                 }
                 gMap.getUiSettings().setScrollGesturesEnabled(toggleFollow);
+                gMap.getUiSettings().setZoomGesturesEnabled(toggleFollow);
+                gMap.getUiSettings().setRotateGesturesEnabled(toggleFollow);
                 toggleFollow = !toggleFollow;
+                Toast.makeText(getBaseContext(), "Following User: " + toggleFollow, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -139,8 +143,7 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if(toggleFollow){
