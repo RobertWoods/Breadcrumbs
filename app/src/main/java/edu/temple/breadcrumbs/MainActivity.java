@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onConnected(@Nullable Bundle bundle) {
                             Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+                            setupLocationListener();
                         }
 
                         @Override
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
         mGoogleApiClient.connect();
         setupButtons();
-        setupLocationListener();
+//        setupLocationListener();
     }
 
     LatLng getLocation() {
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 toggleDrop = !toggleDrop;
-                Toast.makeText(getBaseContext(), "Dropping Crumbs: " + toggleFollow, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Dropping Crumbs: " + toggleDrop, Toast.LENGTH_SHORT).show();
             }
         });
         findViewById(R.id.toggle_follow_button).setOnClickListener(new View.OnClickListener() {
@@ -139,11 +141,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void setupLocationListener(){
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, new LocationListener() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                LocationRequest.create().setInterval(1000)
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setSmallestDisplacement(5), new com.google.android.gms.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if(toggleFollow){
@@ -160,21 +164,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 oldLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
             }
         });
     }
